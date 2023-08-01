@@ -16,4 +16,7 @@ DB_NAME = config.get('mongo', 'db_name')
 DB_USERNAME = config.get('mongo', 'db_username')
 DB_PASSWORD = config.get('mongo', 'db_password')
 
+FIREFLY_ENDPOINT = config.get('firefly', 'url')
+FIREFLY_TOKEN = config.get('firefly', 'token')
+
 client = None

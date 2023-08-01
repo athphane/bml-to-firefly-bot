@@ -16,6 +16,10 @@ class TransactionsDB:
         }
 
         record = self.transactions.find_one(query)
+
+        if not record:
+            return None
+
         return Transaction.make(record)
 
     def create(self, transaction_data):

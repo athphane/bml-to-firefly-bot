@@ -54,3 +54,16 @@ class VendorsDB:
 
     def delete(self, vendor_name):
         self.vendors.delete_many({'name': vendor_name})
+
+    def assign_category(self, vendor_name, category_name):
+        query = {
+            'name': vendor_name
+        }
+
+        data = {
+
+        }
+        pass
+
+    def get_categories(self, vendor_name):
+        pass

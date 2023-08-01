@@ -5,6 +5,7 @@ from bmlfireflybot.database.vendors import VendorsDB
 
 class Transaction:
     def __init__(self, transaction_data):
+        print(transaction_data)
         self._id = transaction_data['_id']
         self.card_number = transaction_data['card_number']
         self.date = transaction_data['date']

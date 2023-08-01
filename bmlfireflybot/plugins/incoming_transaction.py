@@ -1,8 +1,10 @@
+from pprint import pprint
+
 from pykeyboard import InlineKeyboard, InlineButton
 from pyrogram import Client
 from pyrogram import emoji
 from pyrogram import filters
-from pyrogram.types import CallbackQuery
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 from pyrogram.types import Message
 
 from bmlfireflybot.database.models.Transaction import Transaction
@@ -10,6 +12,7 @@ from bmlfireflybot.database.models.Vendor import Vendor
 from bmlfireflybot.database.transactions import TransactionsDB
 from bmlfireflybot.database.vendors import VendorsDB
 from bmlfireflybot.helpers import custom_filters
+from bmlfireflybot.helpers.firefly import FireflyAPI
 from bmlfireflybot.helpers.transactions_regex import extract_transaction_data
 
 
@@ -39,7 +42,7 @@ async def incoming_transaction(bot, message: Message):
         keyboard.add(
             InlineButton(
                 f"{emoji.SHOPPING_BAGS} Assign Category",
-                f"assign_category+{transaction.id}:{transaction_data['location'].lower()}"
+                f"assign_category+{transaction.ref_no}:{transaction_data['location'].lower()}"
             )
         )
 
@@ -78,12 +81,29 @@ async def assign_category_to_vendor_step_one(_, callback: CallbackQuery):
 
 @Client.on_message(filters.reply & filters.text)
 async def save_new_category_to_vendor(bot, message: Message):
+
+    transactions = FireflyAPI().get_transactions()
+
+    pprint(transactions, indent=4)
+
+    if not isinstance(message.reply_to_message.reply_markup, InlineKeyboardMarkup):
+        return
+
     transaction_id = message.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
 
     if transaction_id.startswith('fake_button+'):
         transaction_id = transaction_id.lstrip('fake_button+')
 
-    await message.reply(transaction_id, reply_to_message_id=message.id)
+    transaction = TransactionsDB().find(transaction_id)
+
+    if transaction:
+        vendor: Vendor = VendorsDB().find(transaction.get_vendor())
+
+        if vendor:
+            VendorsDB().assign_category(transaction.get_vendor(), message.text)
+            categories = VendorsDB().get_categories(transaction.get_vendor())
+
+    await message.reply(message.text)
 
 
 @Client.on_callback_query(custom_filters.callback_query('fake_button'))
