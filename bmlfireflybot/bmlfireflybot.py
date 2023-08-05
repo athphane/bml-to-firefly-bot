@@ -1,11 +1,8 @@
 import ast
-import os
-import sys
 from configparser import ConfigParser
 from functools import wraps
 from typing import Optional, List, Union, BinaryIO
 
-import psutil as psutil
 from pyrogram import Client, types
 from pyrogram.raw.all import layer
 from pyrogram.types import Message, CallbackQuery
@@ -48,30 +45,8 @@ class BmlFireflyBot(Client):
         await super().stop()
         print(f"{self.__class__.__name__} stopped. Bye.")
 
-    async def restart(self, git_update=False, pip=False, *args):
-        """
-        Restart the bot for reals.
-        :return:
-        """
-        await self.stop()
-
-        try:
-            c_p = psutil.Process(os.getpid())
-            for handler in c_p.open_files() + c_p.connections():
-                os.close(handler.fd)
-        except Exception as c_e:
-            print(c_e)
-
-        if git_update:
-            os.system('git pull')
-        if pip:
-            os.system('pip install -r requirements.txt')
-
-        os.execl(sys.executable, sys.executable, '-m', self.__class__.__name__.lower())
-        sys.exit()
-
     def admins(self):
-        return ast.literal_eval(self.config.get(self.name, 'admins'))
+        return ast.literal_eval(self.config.get('bot', 'admins'))
 
     def is_admin(self, entity: Message or CallbackQuery) -> bool:
         user_id = entity.from_user.id
