@@ -1,0 +1,17 @@
+[pyrogram]
+api_id=
+api_hash=
+bot_token=
+
+[bot]
+admins=[]
+
+[mongo]
+url=localhost:27017
+db_name=bml_firefly_bot
+db_username=
+db_password=
+
+[firefly]
+url=https://firefly.domain.com
+token=
